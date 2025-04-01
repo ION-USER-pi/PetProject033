@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>petproject033</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.0.0/d3.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #1a2530;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--primary-color);
+            background: #f9f9f9;
+            overflow-x: hidden;
+        }
+        
+        header {
+            background: var(--primary-color);
+            color: white;
+            padding: 2rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        nav {
+            background: var(--dark-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li a {
+            display: block;
+            color: white;
+            text-decoration: none;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links li a:hover {
+            background: var(--secondary-color);
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+        
+        section {
+            margin-bottom: 4rem;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 0.5rem;
+        }
+        
+        h2::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 3px;
+            width: 50px;
+            background: var(--secondary-color);
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+        }
+        
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card-header {
+            background: var(--secondary-color);
+            color: white;
+            padding: 1.5rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .card h3 {
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            padding: 0.8rem 2rem;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .diagram-container {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem 0;
+            height: 400px;
+            position: relative;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-container {
+            margin: 2rem 0;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        
+        .tab-btn {
+            padding: 0.8rem 1.5rem;
+            background: #f1f1f1;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 0 10px 10px 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 1.5rem;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 1.5rem 0;
+        }
+        
+        pre {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            background: var(--primary-color);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-links {
+                position: fixed;
+                top: 60px;
+                right: -100%;
+                flex-direction: column;
+                background: var(--dark-color);
+                width: 80%;
+                height: calc(100vh - 60px);
+                transition: all 0.5s ease;
+            }
+            
+            .nav-links.active {
+                right: 0;
+            }
+            
+            .nav-links li {
+                width: 100%;
+            }
+            
+            .nav-links li a {
+                padding: 1.5rem 2rem;
+                border-bottom: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-bg" id="header-bg"></div>
+        <div class="header-content">
+            <h1>Mapping and Querying Disparate Knowledge Bases</h1>
+            <p class="subtitle">Unifying heterogeneous data sources to extract comprehensive insights across domains</p>
+            <a href="#learn-more" class="btn">Learn More</a>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="nav-container">
+            <div class="logo">KB<span style="color: var(--secondary-color);">Connect</span></div>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#challenges">Challenges</a></li>
+                <li><a href="#approaches">Approaches</a></li>
+                <li><a href="#implementation">Implementation</a></li>
+                <li><a href="#case-studies">Case Studies</a></li>
+            </ul>
+            <button class="mobile-menu-btn">☰</button>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>Knowledge bases are structured repositories of information that represent facts about the world and the relationships between entities. In today's digital landscape, organizations maintain multiple knowledge bases that differ in structure, terminology, coverage, and underlying technology.</p>
+            <p>Mapping and querying disparate knowledge bases involves developing techniques and frameworks to create connections across these heterogeneous data sources, enabling unified access and comprehensive analysis.</p>
+            
+            <div class="diagram-container">
+                <div id="visualization"></div>
+            </div>
+        </section>
+        
+        <section id="challenges">
+            <h2>Key Challenges</h2>
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Schema Heterogeneity</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Different knowledge bases use varying schemas, ontologies, and data models to organize information, making direct comparison or integration challenging.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Semantic Ambiguity</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>The same concept may be represented differently across systems, while identical terms might have different meanings depending on context.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Incompleteness</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Knowledge bases often have partial coverage of domains, leading to gaps when attempting to perform comprehensive analysis across sources.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="approaches">
+            <h2>Integration Approaches</h2>
+            
+            <div class="tab-container">
+                <div class="tab-buttons">
+                    <button class="tab-btn active" data-tab="ontology">Ontology Mapping</button>
+                    <button class="tab-btn" data-tab="federation">Query Federation</button>
+                    <button class="tab-btn" data-tab="embedding">Embedding-Based</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div class="tab-pane active" id="ontology">
+                        <h3>Ontology Mapping</h3>
+                        <p>Ontology mapping establishes relationships between concepts in different knowledge bases by identifying equivalent classes, properties, and instances. This approach creates a semantic bridge that allows queries to traverse multiple ontologies.</p>
+                        <p>Key techniques include:</p>
+                        <ul>
+                            <li>Lexical matching of concept names and descriptions</li>
+                            <li>Structural analysis of concept hierarchies</li>
+                            <li>Instance-based matching using shared examples</li>
+                            <li>Background knowledge exploitation from upper ontologies</li>
+                        </ul>
+                        
+                        <div class="code-block">
+                            <pre>
+# Example OWL mapping using rdflib
+from rdflib import Graph, Namespace, URIRef
+from rdflib.namespace import OWL, RDFS
+
+# Load ontologies
+g1 = Graph()
+g1.parse("ontology1.owl")
+g2 = Graph()
+g2.parse("ontology2.owl")
+
+# Create mapping
+mapping = Graph()
+ns1 = Namespace("http://example.org/onto1#")
+ns2 = Namespace("http://example.org/onto2#")
+
+# Define equivalence between concepts
+mapping.add((ns1.Person, OWL.equivalentClass, ns2.Individual))
+mapping.add((ns1.hasName, OWL.equivalentProperty, ns2.fullName))
+
+# Save mapping
+mapping.serialize("mapping.owl")</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="federation">
+                        <h3>Query Federation</h3>
+                        <p>Query federation enables unified access to multiple knowledge bases by translating a single query into sub-queries appropriate for each source, then combining the results.</p>
+                        <p>This approach maintains the autonomy of individual knowledge bases while providing a unified interface for users and applications.</p>
+                        
+                        <div class="code-block">
+                            <pre>
+# Example SPARQL federated query
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+SELECT ?person ?name ?abstract WHERE {
+  # Query first knowledge base
+  SERVICE <http://example.org/sparql1> {
+    ?person a foaf:Person ;
+            foaf:name ?name .
+  }
+  
+  # Query second knowledge base
+  SERVICE <http://dbpedia.org/sparql> {
+    ?dbpediaPerson a dbo:Person ;
+                   foaf:name ?name ;
+                   dbo:abstract ?abstract .
+    FILTER(LANG(?abstract) = 'en')
+  }
+}</pre>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="embedding">
+                        <h3>Embedding-Based Integration</h3>
+                        <p>Modern approaches leverage vector embeddings to represent entities and relations in a shared semantic space, enabling similarity-based mapping and integration.</p>
+                        <p>Knowledge graph embeddings can capture complex semantic relationships that are difficult to model with traditional rule-based approaches.</p>
+                        
+                        <div class="code-block">
+                            <pre>
+# Example using PyTorch and PyKEEN for knowledge graph embeddings
+import torch
+from pykeen.pipeline import pipeline
+
+# Train embeddings on first knowledge graph
+result1 = pipeline(
+    dataset='kb1',
+    model='TransE',
+    epochs=100,
+)
+
+# Train embeddings on second knowledge graph
+result2 = pipeline(
+    dataset='kb2',
+    model='TransE',
+    epochs=100,
+)
+
+# Extract entity embeddings
+entity_embeddings1 = result1.model.entity_embeddings.weight.detach()
+entity_embeddings2 = result2.model.entity_embeddings.weight.detach()
+
+# Find closest entities across KBs using cosine similarity
+def find_matches(kb1_entity_id, top_k=5):
+    emb1 = entity_embeddings1[kb1_entity_id]
+    
+    # Compute similarities
+    similarities = torch.nn.functional.cosine_similarity(
+        emb1.unsqueeze(0),
+        entity_embeddings2,
+        dim=1
+    )
+    
+    # Get top-k matches
+    top_values, top_indices = torch.topk(similarities, k=top_k)
+    return [(idx.item(), val.item()) for idx, val in zip(top_indices, top_values)]</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="implementation">
+            <h2>Implementation Architectures</h2>
+            <p>Several architectural patterns have emerged for implementing knowledge base integration:</p>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Mediator-based</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>A central mediator component translates queries between a global schema and local schemas of individual knowledge bases. This approach maintains source autonomy while providing a unified view.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Data Warehouse</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Data from multiple sources is extracted, transformed, and loaded into a unified repository with a consistent schema. This approach optimizes query performance but requires regular updates.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Linked Data</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Using Semantic Web standards like RDF and OWL, entities across knowledge bases are connected through links, enabling traversal across sources while maintaining their original structure.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="case-studies">
+            <h2>Case Studies</h2>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Biomedical Research</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Integrating gene databases, protein interaction networks, and clinical trial repositories to enable cross-domain discoveries in drug development and disease research.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Enterprise Knowledge Management</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Unifying product databases, customer information systems, and support knowledge bases to provide comprehensive views for decision-making.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Scientific Literature Analysis</h3>
+                    </div>
+                    <div class="card-body">
+                        <p>Connecting citation networks, research datasets, and semantic concept repositories to track the evolution of scientific knowledge across disciplines.</p>
+                        <a href="#" class="btn">Read More</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <footer>
+        <div class="footer-content">
+            <p>&copy; 2025 Knowledge Integration Systems</p>
+            <p>Connecting the world's knowledge, one link at a time</p>
+        </div>
+    </footer>
+
+    <script>
+        $(document).ready(function() {
+            // Mobile menu toggle
+            $('.mobile-menu-btn').click(function() {
+                $('.nav-links').toggleClass('active');
+            });
+            
+            // Smooth scrolling for navigation
+            $('nav a').click(function(e) {
+                e.preventDefault();
+                
+                $('.nav-links').removeClass('active');
+                
+                var target = $(this).attr('href');
+                
+                $('html, body').animate({
+                    scrollTop: $(target).offset().top - 70
+                }, 800);
+            });
+            
+            // Tab functionality
+            $('.tab-btn').click(function() {
+                const tab = $(this).data('tab');
+                
+                $('.tab-btn').removeClass('active');
+                $(this).addClass('active');
+                
+                $('.tab-pane').removeClass('active');
+                $('#' + tab).addClass('active');
+            });
+            
+            // Create animated header background
+            createHeaderBackground();
+            
+            // Create knowledge base visualization
+            createVisualization();
+        });
+        
+        function createHeaderBackground() {
+            const svg = d3.select("#header-bg")
+                .append("svg")
+                .attr("width", "100%")
+                .attr("height", "100%")
+                .style("position", "absolute")
+                .style("top", 0)
+                .style("left", 0);
+            
+            const width = document.getElementById("header-bg").offsetWidth;
+            const height = document.getElementById("header-bg").offsetHeight;
+            
+            // Generate random nodes and connections
+            const numNodes = 30;
+            const nodes = Array.from({ length: numNodes }).map(() => ({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                r: Math.random() * 5 + 2,
+            }));
+            
+            const links = [];
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    if (Math.random() > 0.9) {
+                        links.push({ source: i, target: j });
+                    }
+                }
+            }
+            
+            // Draw connections
+            svg.selectAll("line")
+                .data(links)
+                .enter()
+                .append("line")
+                .attr("x1", d => nodes[d.source].x)
+                .attr("y1", d => nodes[d.source].y)
+                .attr("x2", d => nodes[d.target].x)
+                .attr("y2", d => nodes[d.target].y)
+                .attr("stroke", "rgba(255, 255, 255, 0.2)")
+                .attr("stroke-width", 1);
+            
+            // Draw nodes
+            svg.selectAll("circle")
+                .data(nodes)
+                .enter()
+                .append("circle")
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
+                .attr("r", d => d.r)
+                .attr("fill", "rgba(255, 255, 255, 0.5)");
+            
+            // Animate nodes
+            setInterval(() => {
+                nodes.forEach(node => {
+                    node.x += (Math.random() - 0.5) * 2;
+                    node.y += (Math.random() - 0.5) * 2;
+                    
+                    if (node.x < 0) node.x = width;
+                    if (node.x > width) node.x = 0;
+                    if (node.y < 0) node.y = height;
+                    if (node.y > height) node.y = 0;
+                });
+                
+                svg.selectAll("circle")
+                    .data(nodes)
+                    .attr("cx", d => d.x)
+                    .attr("cy", d => d.y);
+                
+                svg.selectAll("line")
+                    .data(links)
+                    .attr("x1", d => nodes[d.source].x)
+                    .attr("y1", d => nodes[d.source].y)
+                    .attr("x2", d => nodes[d.target].x)
+                    .attr("y2", d => nodes[d.target].y);
+            }, 100);
+        }
+        
+        function createVisualization() {
+            const container = d3.select("#visualization");
+            const width = document.querySelector(".diagram-container").offsetWidth;
+            const height = document.querySelector(".diagram-container").offsetHeight;
+            
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+            
+            // Define knowledge bases
+            const kbs = [
+                { name: "Scientific Literature", color: "#3498db", x: width * 0.25, y: height * 0.3, radius: 70 },
+                { name: "Enterprise Data", color: "#e74c3c", x: width * 0.75, y: height * 0.3, radius: 70 },
+                { name: "Open Knowledge Graphs", color: "#2ecc71", x: width * 0.5, y: height * 0.7, radius: 70 }
+            ];
+            
+            // Draw knowledge bases
+            svg.selectAll(".kb")
+                .data(kbs)
+                .enter()
+                .append("circle")
+                .attr("cx", d => d.x)
+                .attr("cy", d => d.y)
+                .attr("r", d => d.radius)
+                .attr("fill", d => d.color)
+                .attr("opacity", 0.7)
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2);
+            
+            // Labels
+            svg.selectAll(".kb-label")
+                .data(kbs)
+                .enter()
+                .append("text")
+                .attr("x", d => d.x)
+                .attr("y", d => d.y)
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .attr("font-weight", "bold")
+                .text(d => d.name);
+            
+            // Connect knowledge bases
+            const connections = [
+                { source: kbs[0], target: kbs[1], label: "Entity Mapping" },
+                { source: kbs[1], target: kbs[2], label: "Schema Alignment" },
+                { source: kbs[2], target: kbs[0], label: "Semantic Bridging" }
+            ];
+            
+            // Draw connections
+            svg.selectAll(".connection")
+                .data(connections)
+                .enter()
+                .append("line")
+                .attr("x1", d => d.source.x)
+                .attr("y1", d => d.source.y)
+                .attr("x2", d => d.target.x)
+                .attr("y2", d => d.target.y)
+                .attr("stroke", "#333")
+                .attr("stroke-width", 2)
+                .attr("stroke-dasharray", "5,5");
+            
+            // Connection labels
+            svg.selectAll(".connection-label")
+                .data(connections)
+                .enter()
+                .append("text")
+                .attr("x", d => (d.source.x + d.target.x) / 2)
+                .attr("y", d => (d.source.y + d.target.y) / 2)
+                .attr("text-anchor", "middle")
+                .attr("fill", "#333")
+                .attr("background", "white")
+                .attr("font-size", "12px")
+                .text(d => d.label);
+            
+            // Add unified query layer on top
+            svg.append("rect")
+                .attr("x", width * 0.3)
+                .attr("y", height * 0.1)
+                .attr("width", width * 0.4)
+                .attr("height", 40)
+                .attr("fill", "#2c3e50")
+                .attr("rx", 10);
+            
+            svg.append("text")
+                .attr("x", width * 0.5)
+                .attr("y", height * 0.1 + 25)
+                .attr("text-anchor", "middle")
+                .attr("fill", "white")
+                .text("Unified Query Interface");
+            
+            // Add arrows from query to KBs
+            kbs.forEach(kb => {
+                svg.append("line")
+                    .attr("x1", width * 0.5)
+                    .attr("y1", height * 0.1 + 40)
+                    .attr("x2", kb.x)
+                    .attr("y2", kb.y - kb.radius)
+                    .attr("stroke", "#333")
+                    .attr("stroke-width", 1.5)
+                    .attr("marker-end", "url(#arrow)");
+            });
+            
+            // Arrow marker definition
+            svg.append("defs").append("marker")
+                .attr("id", "arrow")
+                .attr("viewBox", "0 -5 10 10")
+                .attr("refX", 10)
+                .attr("refY", 0)
+                .attr("markerWidth", 6)
+                .attr("markerHeight", 6)
+                .attr("orient", "auto")
+                .append("path")
+                .attr("d", "M0,-5L10,0L0,5")
+                .attr("fill", "#333");
+        }
+    </script>
+</body>
+</html>
